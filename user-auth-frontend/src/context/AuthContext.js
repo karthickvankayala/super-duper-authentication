@@ -11,34 +11,36 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // null = not logged in
 
+  // Create axios instance with base URL from .env
+  const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    withCredentials: true
+  });
+
   // Load user on mount (optional: fetch from /me endpoint)
   useEffect(() => {
-    axios
-      .get('/api/users/me', { withCredentials: true })
+    api
+      .get('/api/users/me')
       .then(res => setUser(res.data))
       .catch(() => setUser(null)); // Not logged in
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post(
-      '/api/auth/login',
-      { email, password },
-      { withCredentials: true }
-    );
+    const res = await api.post('/api/auth/login', { email, password });
     setUser(res.data.user);
   };
 
   const logout = async () => {
-    await axios.post('/api/auth/logout', {}, { withCredentials: true });
+    await api.post('/api/auth/logout', {});
     setUser(null);
   };
 
   const remove = async (email) => {
-    await axios.put('/api/users/deactivate', {email}, { withCredentials: true });
+    await api.put('/api/users/deactivate', { email });
   };
 
   const activate = async (email) => {
-    await axios.put('/api/users/activate', {email}, { withCredentials: true });
+    await api.put('/api/users/activate', { email });
   };
 
   return (

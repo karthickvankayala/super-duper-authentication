@@ -6,7 +6,7 @@ This is a full-stack user management application with:
 - **Backend:** Node.js, Express, SQLite
 - **Authentication:** Secure login with JWT stored in HttpOnly cookies 
 - **Authorization:** Role Based Access Controls
-- **Reverse Proxy:** NGINX or Spring Cloud Gateway for BFF pattern (Pening implementation)
+- **Reverse Proxy:** NGINX or Spring Cloud Gateway for BFF pattern (Pending implementation)
 
 ---
 
