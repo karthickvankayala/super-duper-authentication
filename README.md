@@ -24,7 +24,7 @@ This is a full-stack user management application with:
 cd user-auth-backend
 npm install
 node db.js       # Initializes the SQLite database
-node server.js         # Starts the backend server on port 3000
+node server.js   # Starts the backend server on port 3001
 ```
 
 ### Frontend Setup
@@ -34,14 +34,50 @@ cd user-auth-frontend
 npm install
 npm run build         # Builds the React app for production
 
+npm start
 Or Using the Nginx config supplied below and starting the Ngix server
 ```
 
 ---
 
+## 🌐 NGINX (Optional)
+
+**Minimal config:**
+
+```nginx
+server {
+  listen 80;
+  server_name localhost;
+
+  location / {
+    root /path/to/user-auth-frontend/build;
+    index index.html;
+    try_files $uri $uri/ /index.html;
+  }
+
+  location /api/ {
+    proxy_pass http://localhost:3001/api/;
+    proxy_http_version 1.1;
+
+    # Forward cookies and headers
+    proxy_set_header Host $host;
+    proxy_set_header Cookie $http_cookie;
+    proxy_pass_request_headers on;
+
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    proxy_cache_bypass $http_upgrade;
+  }
+}
+```
+- App will be running on Nginx port (80 from above config)
+- optionally you can remove setupProxy.js from user-auth-frontend > src > setupProxy.js (Nginx can handle the API routing)
+---
+
 ## 🖥️ Using the UI
 
-1. Visit `http://localhost`
+1. Visit `http://localhost:3000` (if using Nginx `http://localhost`)
 2. If not logged in:
    - You’ll see options to **Login** or **Register**
 3. Once logged in:
@@ -61,9 +97,17 @@ Or Using the Nginx config supplied below and starting the Ngix server
 We have currently create two objects
 
 - user
+  - id INTEGER PRIMARY KEY 
+  - name TEXT NOT NULL
+  - email MAIL UNIQUE NOT NULL
+  - password TEXT NOT NULL
+  - role TEXT NOT NULL DEFAULT 'user'
+  - dob TEXT NOT NULL
+  - job_title TEXT
+  - is_active INTEGER DEFAULT 1
 - role
 
-one to many mapping b/w role and user
+many to one mapping from user to role
 ---
 
 ## 📦 API Endpoints
@@ -183,40 +227,6 @@ Admin-only endpoint to mark a user as inactive.
   - `authorizeAdmin`
   - `authorizeAudit`
 - Frontend doesn't access JWT directly
-
----
-
-## 🌐 NGINX (Optional)
-
-**Minimal config:**
-
-```nginx
-server {
-  listen 80;
-  server_name localhost;
-
-  location / {
-    root /path/to/user-auth-frontend/build;
-    index index.html;
-    try_files $uri $uri/ /index.html;
-  }
-
-  location /api/ {
-    proxy_pass http://localhost:3000/api/;
-    proxy_http_version 1.1;
-
-    # Forward cookies and headers
-    proxy_set_header Host $host;
-    proxy_set_header Cookie $http_cookie;
-    proxy_pass_request_headers on;
-
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Real-IP $remote_addr;
-
-    proxy_cache_bypass $http_upgrade;
-  }
-}
-```
 
 ---
 

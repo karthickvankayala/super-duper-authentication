@@ -1,51 +1,69 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
-// Create context
-const AuthContext = createContext();
+const AuthContext = createContext(undefined);
 
-// Export custom hook
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  return ctx;
+};
 
-// Provider component
+// Build the base URL for CRA
+const normalizeApiBase = (base) => {
+  const fallback = 'http://localhost:3001/api';
+  if (!base) return fallback;
+  const trimmed = base.replace(/\/+$/, '');
+  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+};
+
+const initialBase = '/api'
+
+// One axios instance for the app
+const api = axios.create({
+  baseURL: initialBase,
+  withCredentials: true, // send/receive cookies
+});
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // null = not logged in
+  const [user, setUser] = useState(null);
 
-  // Create axios instance with base URL from .env
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-    withCredentials: true
-  });
-
-  // Load user on mount (optional: fetch from /me endpoint)
+  // Load current user (cookie-based)
   useEffect(() => {
     api
-      .get('/api/users/me')
-      .then(res => setUser(res.data))
-      .catch(() => setUser(null)); // Not logged in
+      .get('/users/me')
+      .then((res) => setUser(res.data))
+      .catch(() => setUser(null));
   }, []);
 
   const login = async (email, password) => {
-    const res = await api.post('/api/auth/login', { email, password });
-    setUser(res.data.user);
+    const res = await api.post('/auth/login', { email, password });
+    if (res.data?.user) {
+      setUser(res.data.user);
+    } else {
+      const me = await api.get('/users/me');
+      setUser(me.data);
+    }
   };
 
   const logout = async () => {
-    await api.post('/api/auth/logout', {});
+    await api.post('/auth/logout', {});
     setUser(null);
   };
 
   const remove = async (email) => {
-    await api.put('/api/users/deactivate', { email });
+    await api.put('/users/deactivate', { email });
+    if (user?.email === email) setUser(null);
   };
 
   const activate = async (email) => {
-    await api.put('/api/users/activate', { email });
+    await api.put('/users/activate', { email });
   };
 
-  return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, remove, activate }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ user, setUser, login, logout, remove, activate, api }),
+    [user]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

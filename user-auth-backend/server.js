@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
+//const cors = require('cors');
 
 const app = express();
 
@@ -13,10 +13,10 @@ app.use(cookieParser());
 app.use('/api', routes);
 
 // Handle CORS
-app.use(cors({
-  origin: 'http://localhost',
+/* app.use(cors({
+  origin: 'http://localhost:3000',
   credentials: true 
-}));
+})); */
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -25,5 +25,5 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
