@@ -15,7 +15,6 @@ This is a full-stack user management application with:
 ### 🧱 Prerequisites
 
 - Node.js and npm    (Download from `https://nodejs.org/`)
-- SQLite3
 - nginx (optional)
 
 ### Backend Setup
@@ -80,15 +79,30 @@ server {
 2. If not logged in:
    - You’ll see options to **Login** or **Register**
 3. Once logged in:
-   - **Admins** can:
+   - **Admins** can: (Sample user: kv1@gmail.com/testuser1)
      - View all users
      - Search users by email
      - Deactivate other users
      - Activate other users
-   - **Audit users** can:
+   - **Audit users** can: (Sample user: kv2@gmail.com/testuser2)
      - Search users by email
-   - **Regular users** can:
+   - **Regular users** can: (Sample user: kv3@gmail.com/testuser3)
      - Only view their own info via search
+
+---
+
+## Sample DB scripts
+```bash
+cd user-auth-backend  
+sqlite3 users.db        # Connects to DB
+SELECT * FROM USERS;    # To list all the users in the system
+# To update role of a particular user
+UPDATE USERS SET ROLE='admin' WHERE EMAIL='ka@ga.co'; 
+# To delete a user record
+DELETE FROM USERS WHERE EMAIL='ka@gm.com';
+# To insert a user record, requires encrypted password to insert
+INSERT INTO USERS (name, email, dob, job_title) VALUES ('kv3', 'kv3@gmail.com', '01/01/1970', 'Employee');
+```
 
 ---
 
