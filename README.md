@@ -14,9 +14,9 @@ This is a full-stack user management application with:
 
 ### 🧱 Prerequisites
 
-- Node.js and npm
+- Node.js and npm    (Download from `https://nodejs.org/`)
 - SQLite3
-- nginx (optional, but currently used for better CORS handling and BFF pattern deployment)
+- nginx (optional)
 
 ### Backend Setup
 
@@ -30,12 +30,11 @@ node server.js   # Starts the backend server on port 3001
 ### Frontend Setup
 
 ```bash
+# Open a different terminal window as backend is not setup as a background job yet
 cd user-auth-frontend
 npm install
 npm run build         # Builds the React app for production
-
-npm start
-Or Using the Nginx config supplied below and starting the Ngix server
+npm start             # Or use the Nginx config below to start Ngix server
 ```
 
 ---
@@ -71,7 +70,7 @@ server {
   }
 }
 ```
-- App will be running on Nginx port (80 from above config)
+- Start Nginx (`brew services stop nginx` for mac) and the app will be running on Nginx port (80 from above config)
 - optionally you can remove setupProxy.js from user-auth-frontend > src > setupProxy.js (Nginx can handle the API routing)
 ---
 
