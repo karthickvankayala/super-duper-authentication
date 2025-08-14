@@ -9,14 +9,6 @@ export const useAuth = () => {
   return ctx;
 };
 
-// Build the base URL for CRA
-const normalizeApiBase = (base) => {
-  const fallback = 'http://localhost:3001/api';
-  if (!base) return fallback;
-  const trimmed = base.replace(/\/+$/, '');
-  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
-};
-
 const initialBase = '/api'
 
 // One axios instance for the app
